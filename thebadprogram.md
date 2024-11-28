@@ -96,9 +96,6 @@ As we observed, `fnR()` was initialized but never used. However, there was a pos
 
 
 
-<<<<<<< HEAD
-``
-=======
 
 The `fnR` function in our code is a critical piece that provides root access, and its presence in the compiled binary poses a significant security risk, especially since it was exploited through vulnerability like buffer overflows. Here’s a detailed breakdown of the function and the changes implemented to enhance security, along with recommendations for preventing such issues at the compilation level.
 **Overview of fnR**
@@ -113,8 +110,6 @@ void fnR(void) {
     execve("/bin/bash", args, NULL);
     exit(0);
 }
->>>>>>> aae348f4b39240954cfd74cd18d9226b662f6714
-
 ```
 - **Access Control:** The function should ideally be made static or removed entirely if it is not used. This limits its visibility and accessibility, reducing the attack surface. If the function is not called anywhere in the program, it should be eliminated during the compilation process.
 
