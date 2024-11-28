@@ -89,14 +89,6 @@ Output of the program is shown as below after implementing these changes:
 ![Buffer Overflow test](./Segmentation.png)
 
 ## Mitigations for visibility of Sensitive function
-As we observed, `fnR()` was initialized but never used. However, there was a possibility that the attacker can utilize this function with the buffer-overflow, to gain the system access. Thus, we proposed hiding it or removing it from the executable binary. To mitigate this:
-  1. Compilation option
-  2. Changing `fnR()` code
-      Instead of `system()` instruction, we are using `execv()`.
-
-
-
-
 The `fnR` function in our code is a critical piece that provides root access, and its presence in the compiled binary poses a significant security risk, especially since it was exploited through vulnerability like buffer overflows. Here’s a detailed breakdown of the function and the changes implemented to enhance security, along with recommendations for preventing such issues at the compilation level.
 **Overview of fnR**
 The original fnR function is designed to print a message indicating that root access has been granted. Using system() suggests that it was intended to spawn a root shell using a Python command. However, this approach is insecure because it can be exploited by attackers if they can manipulate the program's execution flow.
