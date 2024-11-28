@@ -42,17 +42,27 @@ For security purpose, stack-protection must be enabled. Thus, either `-fstack-pr
 
 ## Linker options (LEGLDFRLAGS)
 ### `-m32`
-The -m32 flag instructs the compiler and linker to generate a 32-bit binary, regardless of the host system's architecture (commonly 64-bit)
+We could check if the program was compiled as 32-bit or 64-bit by running **file door-locker**, which gives us ELF 32. It indicated the file type and architecture which in our case was ELF 32-bit (Linux). 
+The `-m32` flag instructs the compiler and linker to generate a 32-bit binary, regardless of the host system's architecture (commonly 64-bit).
 
 # Identified threats and their mitigation
 In this section, we will try to implement the mitigations we proposed in previous report. 
 
-## Mitigations for Buffor overflow
-For mitigation of Buffer overflow vulnerability we are applying the following approach:
+## Mitigations for Buffer Overflow
 
-<!--  -->
+To mitigate the **buffer overflow** vulnerability in the code, we replaced the **scanf()** in **validate()** function with **fgets()** function. It is more secure as it prevents buffer overflow by limiting the number of characters read.
+
+```c
+if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
+  return -1;
+}
+```
+
+By following this steps, we can effectively mitigate buffer overflow vulnerability in the program.
+
 
 ## Mitigations for visibility of Sensitive function
+
 
 
 ## alternative of 'strtol'
@@ -60,7 +70,7 @@ For mitigation of Buffer overflow vulnerability we are applying the following ap
 ## Improved user feedback and error message
 
 
-# Recommendation for future processes
+## Recommendation for future processes
  
 
 
