@@ -72,8 +72,8 @@ if (!valid_integer(argv[1]) || !valid_integer(argv[2]))
 
 Output of the program is shown as below after implementing these changes:
 
-![Input Check](/strtol_output.png)
-![Buffer Overflow test](/Segmentation.png)
+![Input Check](./strtol_output.png)
+![Buffer Overflow test](./Segmentation.png)
 
 ## Mitigations for visibility of Sensitive function
 As we observed, `fnR()` was initialized but never used. However, there was a possibility that the attacker can utilize this function with the buffer-overflow, to gain the system access. Thus, we proposed hiding it or removing it from the executable binary. To mitigate this:
