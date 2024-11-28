@@ -24,24 +24,24 @@ lang: en-GB
 
 
 # Introduction
-In this practical session, we will learn and apply our knowledge on threat finndings, their mitigations using compilation options, or directly modifying the code itself. Lastly, we will present our some recommendation on improving the process.
+In this practical session, we will learn and apply our knowledge on threat finndings, their mitigations using compilation options, or directly modifying the code itself. Lastly, we will present some recommendations on improving the process.
 
 # Options used for Legacy version
-In this, we explored the various options that might have been used to compile our original door-locker binary. The compilation flags we will put into `LEGCFLAGS=` and the linker flags we will put `LEGLDFRLAGS=`.
+In this, we explored the various options that might have been used to compile our original door-locker binary. The compilation flags we will put into `LEGCFLAGS=` and the linker flags into `LEGLDFRLAGS=`.
 
 ## Compilation options (LEGCFLAGS)
 ### `-fno-stack-protector`
 With the use of checksec tool, we saw that the provided `door-locker` binary doesn't have the canary. Thus, we assume that the flags `-fno-stack-protector` must have been used to disable stack protection. 
 Stack protection is a security feature that helps prevent stack buffer overflow attacks. It works by inserting a stack canary value before the return address in a function's stack frame. During execution, the program checks this canary value before returning from a function. If the canary value has been altered (indicating a potential overflow), the program terminates with a security error.
-For security purpose, stack-protection must be enabled. Thus, either `-fstack-protection` or `-fstack-protection-all` options must be used.
+For security purpose, stack protection must be enabled. Thus, either `-fstack-protection` or `-fstack-protection-all` options must be used.
 
 ### `-D_FORTIFY_SOURCE=0`
-`D_FORTIFY_SOURCE` option enables or disables additional buffer overflow checks for standard library functions. It checks the size of buffers and flags issues if they exceed their allocated memory. However, for security purpose, it's value must be 2 (or 3).
+`D_FORTIFY_SOURCE` option enables or disables additional buffer overflow checks for standard library functions. It checks the size of buffers and flags issues if they exceed their allocated memory. However, for security purpose, its value must be 2 (or 3).
 
 
 ### `-fno-PIE`
 This option disables the generation of position-independent code (PIC) for executables. The code is compiled with fixed memory addresses, meaning it assumes the program will always be loaded at a specific base address in memory.
-Without PIE enabled, executables have fixed memory layouts, which attackers can exploit to craft reliable attacks like Return-Oriented Programming (ROP). Thus, this shouldn't be used for compilation, instead it should be enabled for better security.
+Without PIE enabled, executables have fixed memory layouts, which attackers can exploit to craft reliable attacks like Return-Oriented Programming (ROP). Thus, it shouldn't be used for compilation; instead, it should be enabled for better security.
 
 
 
@@ -134,7 +134,4 @@ There are few things to improve on the overall project devopment process from sp
 
 # Conclusion
 Through examine the programming source code, we have identified the ways on how to improve the program from code-perspective and also from various compilation options. The implementation of effective patches such as replacing unsafe functions with safer alternatives and enhancing input validation demonstrates proactive to mitigating vulnerabilities. 
-Additionally, the review of compilation options revealed an opportunities to strengthen the program's security by implementing secure flags. 
-
-
-
+Additionally, the review of compilation options revealed an opportunities to strengthen the program's security by implementing secure flags.
