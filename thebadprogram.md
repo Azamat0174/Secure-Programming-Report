@@ -125,15 +125,6 @@ To prevent the inclusion of dead code like **fnR()** in the final binary, to ena
 ![Canary Found](./stack.png)
 
 
-- D_FORTIFY_SOURCES
-  The -D_FORTIFY_SOURCE macro in GCC/glibc enables additional checks on standard library functions (e.g., memcpy, strcpy) to detect and prevent buffer overflows at compile time and runtime. It enhances security but requires optimization (-O1 or higher).
-      0: Disables all fortification checks. Equivalent to not defining _FORTIFY_SOURCE.
-      1: Enables basic checks, focusing on statically known buffer sizes. Suitable for general use with minimal performance overhead.
-      2: Enables strict checks, covering more cases, including dynamically sized buffers. Recommended for high-security applications.
-      3 (glibc 2.34+): Further enhances runtime checks and stricter validations for even more security, but may introduce compatibility issues or performance overhead.
-  Hence, we recommend using `D_FORTIFY_SOURCES=2`.
-
-
 ## Recommendation for future processes
 There are few things to improve on the overall project devopment process from specification, design and conceptual to the development and deployment. 
 - Initially, Developers should be aware of which functions are used/not-used for the operation of the program/system
