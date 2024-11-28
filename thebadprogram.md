@@ -30,20 +30,33 @@ In this practical session, we will learn and apply our knowledge on threat finnd
 In this, we explored the various options that might have been used to compile our original door-locker binary. The compilation flags we will put into `LEGCFLAGS=` and the linker flags we will put `LEGLDFRLAGS=`.
 
 ## Compilation options (LEGCFLAGS)
-### `-fno-stack-protector`
+1. `-fno-stack-protector`
 With the use of checksec tool, we saw that the provided `door-locker` binary doesn't have the canary. Thus, we assume that the flags `-fno-stack-protector` must have been used to disable stack protection. 
 Stack protection is a security feature that helps prevent stack buffer overflow attacks. It works by inserting a stack canary value before the return address in a function's stack frame. During execution, the program checks this canary value before returning from a function. If the canary value has been altered (indicating a potential overflow), the program terminates with a security error.
 For security purpose, stack-protection must be enabled. Thus, either `-fstack-protection` or `-fstack-protection-all` options must be used.
 
-### `-D_FORTIFY_SOURCE=0`
-`D_FORTIFY_SOURCE` option enables or disables additional buffer overflow checks for standard library functions. It checks the size of buffers and flags issues if they exceed their allocated memory. However, for security purpose, it's value must be 2.
+2. `-D_FORTIFY_SOURCE=0`
+`D_FORTIFY_SOURCE` option enables or disables additional buffer overflow checks for standard library functions. It checks the size of buffers and flags issues if they exceed their allocated memory. However, for security purpose, it's value must be 2 (or 3).
 
-### ``
+
+3. `-fno-PIE`
+This option disables the generation of position-independent code (PIC) for executables. The code is compiled with fixed memory addresses, meaning it assumes the program will always be loaded at a specific base address in memory.
+Without PIE enabled, executables have fixed memory layouts, which attackers can exploit to craft reliable attacks like Return-Oriented Programming (ROP). Thus, this shouldn't be used for compilation, instead it should be enabled for better security.
+
+
 
 ## Linker options (LEGLDFRLAGS)
-### `-m32`
+1. `-m32`
 We could check if the program was compiled as 32-bit or 64-bit by running **file door-locker**, which gives us ELF 32. It indicated the file type and architecture which in our case was ELF 32-bit (Linux). 
 The `-m32` flag instructs the compiler and linker to generate a 32-bit binary, regardless of the host system's architecture (commonly 64-bit).
+
+2. `-z noexecstack`
+The `-z noexecstack` option is a linker flag used to mark the program's stack segment as non-executable, enhancing security against stack-based exploits, such as stack buffer overflow attacks. We can see this with `readelf` command as:
+![No exec Stack](./noexecstack.png)
+
+3. `-no-pie`
+This option tells the linker to create a traditional non-position-independent executable, which won't support ASLR. Thus, it shouldn't be used, instead `-pie` must be used with `-fPIE` compilation option for enabling security supporting ASLR.
+
 
 # Identified threats and their mitigation
 In this section, we will try to implement the mitigations we proposed in previous report. 
@@ -76,6 +89,13 @@ Output of the program is shown as below after implementing these changes:
 ![Buffer Overflow test](./Segmentation.png)
 
 ## Mitigations for visibility of Sensitive function
+As we observed, `fnR()` was initialized but never used. However, there was a possibility that the attacker can utilize this function with the buffer-overflow, to gain the system access. Thus, we proposed hiding it or removing it from the executable binary. To mitigate this:
+  1. Compilation option
+  2. Changing `fnR()` code
+      Instead of `system()` instruction, we are using `execv()`.
+
+
+
 
 The `fnR` function in our code is a critical piece that provides root access, and its presence in the compiled binary poses a significant security risk, especially since it was exploited through vulnerability like buffer overflows. Here’s a detailed breakdown of the function and the changes implemented to enhance security, along with recommendations for preventing such issues at the compilation level.
 **Overview of fnR**
