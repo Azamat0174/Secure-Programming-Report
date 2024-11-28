@@ -77,11 +77,40 @@ Output of the program is shown as below after implementing these changes:
 
 ## Mitigations for visibility of Sensitive function
 
+The `fnR` function in our code is a critical piece that provides root access, and its presence in the compiled binary poses a significant security risk, especially since it was exploited through vulnerability like buffer overflows. Here’s a detailed breakdown of the function and the changes implemented to enhance security, along with recommendations for preventing such issues at the compilation level.
+**Overview of fnR**
+The original fnR function is designed to print a message indicating that root access has been granted. Using system() suggests that it was intended to spawn a root shell using a Python command. However, this approach is insecure because it can be exploited by attackers if they can manipulate the program's execution flow.
+- **Replacement of system() with execve():** - The use of `execve()` is a more secure alternative to `system()`. The execve() function directly executes a program, providing better control over the environment and reducing the risk of command injection attacks. This change helps mitigate the risk associated with executing arbitrary shell commands.
+```c
+void fnR(void) {
+    puts("Opened.");
+    puts("Be careful, you are ROOT !\n");
+    // Replacing the system() function with execve() function
+    char *args[] = {"/bin/bash", "--norc", NULL};
+    execve("/bin/bash", args, NULL);
+    exit(0);
+}
 
+```
+- **Access Control:** The function should ideally be made static or removed entirely if it is not used. This limits its visibility and accessibility, reducing the attack surface. If the function is not called anywhere in the program, it should be eliminated during the compilation process.
 
-## alternative of 'strtol'
+## Recommendations for Compilation and Security
+To prevent the inclusion of dead code like **fnR()** in the final binary, to enable canaries to protect from buffer overflow, and to enhance the overall security, we considered these options:
+- Compiler Optimization:
+  Using optimization flags such as -O2 or -O3 to enable aggressive optimizations that can help eliminate dead code and improve performance. These optimizations can also help the compiler identify and remove unused functions. 
+- Visibility Attributes:
+  Even if the unused funciton somehow is important to keep in the program and it has some security threats, we could have declared sensitive functions as static to limit their visibility to the file scope. This prevents external access and reduces the risk of exploitation. By using `__attribute__((visibility("hidden")))` for the fnR that should not be exposed outside the compilation unit.
+- Enabling canaries:
+  By adding the ``-fstack-protector`` in the compilation we enabled the stack protection, which added canary values to the stack before return address. 
+- Stack Protection:
+  Using ``-D_FORTIFY_SOURCE=2`` enabled additional compile-time and runtime checks for vulnerable functions (like strcpy, sprintf, etc.). This helps prevent buffer overflows by aborting the program if a potential overflow is detected.
+- No-Execute Stack:
+  The ``-Wl,-z,noexecstack`` linker option marks the stack as non-executable. This prevents attackers from executing code that they may inject into the stack, which is a common technique in buffer overflow attacks.
+- Position Independent Executables ``(PIE):``
+  Compiling the program as a Position Independent Executable using the ``-fPIE`` flag. This, combined with Address Space Layout Randomization `(ASLR)`, randomizes the memory addresses used by the executable, making it harder for attackers to predict where their payloads will be executed.
 
-## Improved user feedback and error message
+After compiling with all these changes `checksec` tool shows the following:
+![Canary Found](./stack.png)
 
 
 ## Recommendation for future processes
