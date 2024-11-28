@@ -62,6 +62,13 @@ By following this steps, we can effectively mitigate buffer overflow vulnerabili
 
 
 ## Mitigations for visibility of Sensitive function
+As we observed, `fnR()` was initialized but never used. However, there was a possibility that the attacker can utilize this function with the buffer-overflow, to gain the system access. Thus, we proposed hiding it or removing it from the executable binary. To mitigate this:
+  1. Compilation option
+  2. Changing `fnR()` code
+      Instead of `system()` instruction, we are using `execv()`.
+
+
+
 
 
 
