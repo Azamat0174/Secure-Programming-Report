@@ -120,8 +120,10 @@ To prevent the inclusion of dead code like **fnR()** in the final binary, to ena
 - Position Independent Executables ``(PIE):``
   Compiling the program as a Position Independent Executable using the ``-fPIE`` flag. This, combined with Address Space Layout Randomization `(ASLR)`, randomizes the memory addresses used by the executable, making it harder for attackers to predict where their payloads will be executed.
 
-After compiling with all these changes `checksec` tool shows the following:
+  After compiling with all these changes `checksec` tool shows the following:
+
 ![Canary Found](./stack.png)
+
 
 - D_FORTIFY_SOURCES
   The -D_FORTIFY_SOURCE macro in GCC/glibc enables additional checks on standard library functions (e.g., memcpy, strcpy) to detect and prevent buffer overflows at compile time and runtime. It enhances security but requires optimization (-O1 or higher).
