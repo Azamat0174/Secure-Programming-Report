@@ -1,6 +1,6 @@
 ---
 title: The Bad Program
-subtitle: The subtitle
+subtitle:
 author: Shiva Prasad Gyawali, Shirinshoev Azamat
 date: 27 November 2024
 geometry: top=1.5cm,left=2cm,right=2cm,bottom=2cm
