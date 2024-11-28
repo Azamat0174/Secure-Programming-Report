@@ -72,8 +72,8 @@ if (!valid_integer(argv[1]) || !valid_integer(argv[2]))
 
 Output of the program is shown as below after implementing these changes:
 
-![Input Check](/strtol_output.png)
-![Buffer Overflow test](/Segmentation.png)
+![Input Check](./strtol_output.png)
+![Buffer Overflow test](./Segmentation.png)
 
 ## Mitigations for visibility of Sensitive function
 
