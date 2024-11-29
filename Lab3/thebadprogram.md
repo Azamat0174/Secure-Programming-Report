@@ -96,6 +96,7 @@ In this way, we can perform the exploit, to modify the system, and to gain the c
 
 # Mitigation
 **Description:** As program does not validate the output file path before writing to it, an attacker could create a symbolic link to a sensitive file (e.g., /etc/shadow) and exploit the timing of the file operations.
+
 **Impact:**
 This vulnerability could allow an attacker to overwrite sensitive files, leading to unauthorized access or privilege escalation. To prevent race conditions in your application, we thought about the following strategies:
 
