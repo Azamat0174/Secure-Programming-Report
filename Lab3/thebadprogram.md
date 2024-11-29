@@ -55,8 +55,8 @@ In the `secure_copy_file()` function, it is working as below:
 Time of Check, Time of Use:
 <!-- Here, since file permission
 Race Condition -->
-## Threats
-### Issues
+## Threat
+Analyzing the `wait_confirmation`, we opserved that it uses the poll system call to wait for user input for a specified duration (3 seconds). If the user does not respond within that time, the function returns a timeout, and the program proceeds to copy the input file to the output file. This behavior can be exploited by an attacker who can manipulate the output file path during the waiting period.
 
 # Exploitation
 To exploit the "Time of Use, Time of Check" vulnerability, we are going to replace `/etc/shadow` with our custom passwords. However, we can't directly do so as we don't have read/write permission to the `/etc/shadow` file. So the idea is:
@@ -105,7 +105,7 @@ Validate user inputs to ensure that the output file path does not point to sensi
 ```
 What we are doing is that we check if the output file path contains `/etc/`, we pring an error message and free any allocated memory before returing an error. 
 **Check for Symlinks:**
-Before writing to a file, we can check if the target is a symlink and resolve it to its actual target. If it points to a sensitive file, deny the operation.
+- Before writing to a file, we can check if the target is a symlink and resolve it to its actual target. If it points to a sensitive file, deny the operation.
 
 ```c 
    struct stat statbuf;
@@ -115,7 +115,16 @@ Before writing to a file, we can check if the target is a symlink and resolve it
    }
 ```
 Here we added `lstat` to check if the output file is a `symbolic link`. If it is, we print an error message and return an error without proceeding with the copy operation.
-
+- Also, we added the code where it check if the confirmation is received from the user to perform copying, because this logic was not properly set in the `wait_confirmation` function. 
+```c
+error = wait_confirmation(in, out);
+            if (error == 0){
+                fprintf(stderr, "Operation cancelled.\n");
+                return -1;
+            } else if (error<0){
+                return error;
+            }
+```
 These modifications help us to mitigate the risk of `race conditions` and unauthorized access to sensitive data. 
 
 # Conclusion
