@@ -52,9 +52,7 @@ In the `secure_copy_file()` function, it is working as below:
 
 ![Secure copy function](./images/secure_copy.png)
 
-Time of Check, Time of Use:
-<!-- Here, since file permission
-Race Condition -->
+
 ## Threat
 Analyzing the `wait_confirmation`, we opserved that it uses the poll system call to wait for user input for a specified duration (3 seconds). If the user does not respond within that time, the function returns a timeout, and the program proceeds to copy the input file to the output file. This behavior can be exploited by an attacker who can manipulate the output file path during the waiting period.
 
