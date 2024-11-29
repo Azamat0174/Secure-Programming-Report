@@ -126,6 +126,10 @@ error = wait_confirmation(in, out);
 These modifications help us to mitigate the risk of `race conditions` and unauthorized access to sensitive data. 
 
 # Conclusion
+In this activity, we discovered a crucial weakness in the system, known as a "Time of Use, Time of Check" (TOCTOU) race condition, that could be used to alter important system files like /etc/shadow. This vulnerability shows how small mistakes in code can result in significant security threats.
 
+To address this issue, we proposed robust mitigation strategies, including input validation, checking for symbolic links, and enforcing user confirmation logic more effectively. Implementing these strategies can significantly enhance the program's resilience against exploitation.
+
+This activity highlights the significance of implementing proactive security measures like secure coding, thorough testing, and regular code reviews in order to develop strong and secure applications. By consistently implementing these practices, developers can avoid introducing vulnerabilities into crucial systems.
 
 
