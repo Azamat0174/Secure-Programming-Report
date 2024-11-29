@@ -93,7 +93,7 @@ In this way, we can perform the exploit, to modify the system, and to gain the c
 This vulnerability could allow an attacker to overwrite sensitive files, leading to unauthorized access or privilege escalation. To prevent race conditions in your application, we thought about the following strategies:
 
 **Input Validation:**
-Validate user inputs to ensure that the output file path does not point to sensitive files. Disallow paths that lead to system files or directories.
+Validating user inputs in `parse_options` function, to ensure that the output file path does not point to sensitive files. 
 
 ```c
    if (strstr(out, "/etc/") != NULL) {
@@ -103,7 +103,7 @@ Validate user inputs to ensure that the output file path does not point to sensi
 ```
 What we are doing is that we check if the output file path contains `/etc/`, we pring an error message and free any allocated memory before returing an error. 
 **Check for Symlinks:**
-- Before writing to a file, we can check if the target is a symlink and resolve it to its actual target. If it points to a sensitive file, deny the operation.
+- Before writing to a file, in the `secure_copy_file` function, we can check if the target is a symlink and resolve it to its actual target. If it points to a sensitive file, deny the operation.
 
 ```c 
    struct stat statbuf;
@@ -113,7 +113,7 @@ What we are doing is that we check if the output file path contains `/etc/`, we 
    }
 ```
 Here we added `lstat` to check if the output file is a `symbolic link`. If it is, we print an error message and return an error without proceeding with the copy operation.
-- Also, we added the code where it check if the confirmation is received from the user to perform copying, because this logic was not properly set in the `wait_confirmation` function. 
+- Also, we added the updated the `secure_copy_file` function where it check if the confirmation is received from the user to perform copying. Because this logic was not properly set in the `wait_confirmation` function. 
 ```c
 error = wait_confirmation(in, out);
             if (error == 0){
