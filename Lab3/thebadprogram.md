@@ -59,6 +59,35 @@ Race Condition -->
 ### Issues
 
 # Exploitation
+To exploit the "Time of Use, Time of Check" vulnerability, we are going to replace `/etc/shadow` with our custom passwords. However, we can't directly do so as we don't have read/write permission to the `/etc/shadow` file. So the idea is:
+- We will execute program as usual with our input file (where we have read access) and output file (where we have write access.)
+- When our program asks us for our confirmation, we will remove our output file, and then create symlink with the same name to /point to `/etc/shadow` file, so that our program will copy content of input file to the `/etc/shadow` file
+
+## Preparing our files:
+![Preparing files](./images/preparing_files.png)
+
+Here:
+  - output: is our output file
+  - shadow.target: is our input file (with our passwords, to replace `/etc/shadow`)
+  ![Target shadow file](./images/original_target_file.png)
+  - Original shadow file has following content:
+  ![Original shadow](./images/original_shadow_file.png)
+
+  - Once we could successfully exploit, then we should be able to write our password for the root user as in target shadow file.
+
+
+
+
+## Program execution and attack
+After preparing our files, and seeing their content, we now perform the exploit. To do so, we first create two panes in tmux session, and prepare our command. In one of pane, we will execute our program, and on another pane, we will prepare our command to remove and create symlink during the program taking time for confirmation.
+![Preparing commands](./images/execution-attack.png)
+
+Now, if we view the content of `/etc/shadow`, it should be replaced by the content of our shadow.target:
+
+![Exploit attack success](./images/exploit-success.png)
+
+In this way, we can perform the exploit, to modify the system, and to gain the complete privilege of the system.
+
 
 # Mitigation
 **Description:** As program does not validate the output file path before writing to it, an attacker could create a symbolic link to a sensitive file (e.g., /etc/shadow) and exploit the timing of the file operations.
