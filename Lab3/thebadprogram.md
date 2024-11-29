@@ -1,7 +1,8 @@
 ---
-title: The Bad Program
+title: Time Your Programs
+subtitle:
 author: Shiva Prasad Gyawali, Shirinshoev Azamat
-date: 27 November 2024
+date: 28 November 2024
 geometry: top=1.5cm,left=2cm,right=2cm,bottom=2cm
 license: CC0 1.0
 numbersections: true
@@ -23,24 +24,24 @@ lang: en-GB
 
 
 # Introduction
-In this practical session, we will learn and apply our knowledge on threat finndings, their mitigations using compilation options, or directly modifying the code itself. Lastly, we will present our some recommendation on improving the process.
+In this practical session, we will learn and apply our knowledge on threat finndings, their mitigations using compilation options, or directly modifying the code itself. Lastly, we will present some recommendations on improving the process.
 
 # Options used for Legacy version
-In this, we explored the various options that might have been used to compile our original door-locker binary. The compilation flags we will put into `LEGCFLAGS=` and the linker flags we will put `LEGLDFRLAGS=`.
+In this, we explored the various options that might have been used to compile our original door-locker binary. The compilation flags we will put into `LEGCFLAGS=` and the linker flags into `LEGLDFRLAGS=`.
 
 ## Compilation options (LEGCFLAGS)
 ### `-fno-stack-protector`
 With the use of checksec tool, we saw that the provided `door-locker` binary doesn't have the canary. Thus, we assume that the flags `-fno-stack-protector` must have been used to disable stack protection. 
 Stack protection is a security feature that helps prevent stack buffer overflow attacks. It works by inserting a stack canary value before the return address in a function's stack frame. During execution, the program checks this canary value before returning from a function. If the canary value has been altered (indicating a potential overflow), the program terminates with a security error.
-For security purpose, stack-protection must be enabled. Thus, either `-fstack-protection` or `-fstack-protection-all` options must be used.
+For security purpose, stack protection must be enabled. Thus, either `-fstack-protection` or `-fstack-protection-all` options must be used.
 
 ### `-D_FORTIFY_SOURCE=0`
-`D_FORTIFY_SOURCE` option enables or disables additional buffer overflow checks for standard library functions. It checks the size of buffers and flags issues if they exceed their allocated memory. However, for security purpose, it's value must be 2 (or 3).
+`D_FORTIFY_SOURCE` option enables or disables additional buffer overflow checks for standard library functions. It checks the size of buffers and flags issues if they exceed their allocated memory. However, for security purpose, its value must be 2 (or 3).
 
 
 ### `-fno-PIE`
 This option disables the generation of position-independent code (PIC) for executables. The code is compiled with fixed memory addresses, meaning it assumes the program will always be loaded at a specific base address in memory.
-Without PIE enabled, executables have fixed memory layouts, which attackers can exploit to craft reliable attacks like Return-Oriented Programming (ROP). Thus, this shouldn't be used for compilation, instead it should be enabled for better security.
+Without PIE enabled, executables have fixed memory layouts, which attackers can exploit to craft reliable attacks like Return-Oriented Programming (ROP). Thus, it shouldn't be used for compilation; instead, it should be enabled for better security.
 
 
 
@@ -106,28 +107,26 @@ void fnR(void) {
 
 ## Recommendations for Compilation and Security
 To prevent the inclusion of dead code like **fnR()** in the final binary, to enable canaries to protect from buffer overflow, and to enhance the overall security, we considered these options:
-
-- `Compiler Optimization:`
+- Compiler Optimization:
   Using optimization flags such as -O2 or -O3 to enable aggressive optimizations that can help eliminate dead code and improve performance. These optimizations can also help the compiler identify and remove unused functions. 
-- `Visibility Attributes:`
+- Visibility Attributes:
   Even if the unused funciton somehow is important to keep in the program and it has some security threats, we could have declared sensitive functions as static to limit their visibility to the file scope. This prevents external access and reduces the risk of exploitation. By using `__attribute__((visibility("hidden")))` for the fnR that should not be exposed outside the compilation unit.
-- `Enabling canaries:`
+- Enabling canaries:
   By adding the ``-fstack-protector`` in the compilation we enabled the stack protection, which added canary values to the stack before return address. 
-- `Stack Protection:`
+- Stack Protection:
   Using ``-D_FORTIFY_SOURCE=2`` enabled additional compile-time and runtime checks for vulnerable functions (like strcpy, sprintf, etc.). This helps prevent buffer overflows by aborting the program if a potential overflow is detected.
-- `No-Execute Stack:`
+- No-Execute Stack:
   The ``-Wl,-z,noexecstack`` linker option marks the stack as non-executable. This prevents attackers from executing code that they may inject into the stack, which is a common technique in buffer overflow attacks.
-- `Position Independent Executables` ``(PIE):``
+- Position Independent Executables ``(PIE):``
   Compiling the program as a Position Independent Executable using the ``-fPIE`` flag. This, combined with Address Space Layout Randomization `(ASLR)`, randomizes the memory addresses used by the executable, making it harder for attackers to predict where their payloads will be executed.
 
   After compiling with all these changes `checksec` tool shows the following:
 
-![Canary Found](./stack.png){width=60%}
+![Canary Found](./stack.png)
 
 
 ## Recommendation for future processes
-There are few things to improve on the overall project devopment process from specification, design and conceptual to the development and deployment.
-
+There are few things to improve on the overall project devopment process from specification, design and conceptual to the development and deployment. 
 - Initially, Developers should be aware of which functions are used/not-used for the operation of the program/system
 - Developers should follow the `secure coding practices` such as not using vulnerable functions, sanitizing user inputs and so on.
 - During compilation, security should be considered.
@@ -135,7 +134,4 @@ There are few things to improve on the overall project devopment process from sp
 
 # Conclusion
 Through examine the programming source code, we have identified the ways on how to improve the program from code-perspective and also from various compilation options. The implementation of effective patches such as replacing unsafe functions with safer alternatives and enhancing input validation demonstrates proactive to mitigating vulnerabilities. 
-Additionally, the review of compilation options revealed an opportunities to strengthen the program's security by implementing secure flags. 
-
-
-
+Additionally, the review of compilation options revealed an opportunities to strengthen the program's security by implementing secure flags.
