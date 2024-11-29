@@ -69,7 +69,7 @@ To exploit the "Time of Use, Time of Check" vulnerability, we are going to repla
 Here:
   - output: is our output file
   - shadow.target: is our input file (with our passwords, to replace `/etc/shadow`)
-  ![Target shadow file](./images/original_target_file.png)
+  ![Target shadow file](./images/shadow-target.png)
   - Original shadow file has following content:
   ![Original shadow](./images/original_shadow_file.png)
 
