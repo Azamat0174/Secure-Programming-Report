@@ -1,6 +1,5 @@
 ---
 title: The Bad Program
-subtitle: The subtitle
 author: Shiva Prasad Gyawali, Shirinshoev Azamat
 date: 27 November 2024
 geometry: top=1.5cm,left=2cm,right=2cm,bottom=2cm
@@ -107,26 +106,28 @@ void fnR(void) {
 
 ## Recommendations for Compilation and Security
 To prevent the inclusion of dead code like **fnR()** in the final binary, to enable canaries to protect from buffer overflow, and to enhance the overall security, we considered these options:
-- Compiler Optimization:
+
+- `Compiler Optimization:`
   Using optimization flags such as -O2 or -O3 to enable aggressive optimizations that can help eliminate dead code and improve performance. These optimizations can also help the compiler identify and remove unused functions. 
-- Visibility Attributes:
+- `Visibility Attributes:`
   Even if the unused funciton somehow is important to keep in the program and it has some security threats, we could have declared sensitive functions as static to limit their visibility to the file scope. This prevents external access and reduces the risk of exploitation. By using `__attribute__((visibility("hidden")))` for the fnR that should not be exposed outside the compilation unit.
-- Enabling canaries:
+- `Enabling canaries:`
   By adding the ``-fstack-protector`` in the compilation we enabled the stack protection, which added canary values to the stack before return address. 
-- Stack Protection:
+- `Stack Protection:`
   Using ``-D_FORTIFY_SOURCE=2`` enabled additional compile-time and runtime checks for vulnerable functions (like strcpy, sprintf, etc.). This helps prevent buffer overflows by aborting the program if a potential overflow is detected.
-- No-Execute Stack:
+- `No-Execute Stack:`
   The ``-Wl,-z,noexecstack`` linker option marks the stack as non-executable. This prevents attackers from executing code that they may inject into the stack, which is a common technique in buffer overflow attacks.
-- Position Independent Executables ``(PIE):``
+- `Position Independent Executables` ``(PIE):``
   Compiling the program as a Position Independent Executable using the ``-fPIE`` flag. This, combined with Address Space Layout Randomization `(ASLR)`, randomizes the memory addresses used by the executable, making it harder for attackers to predict where their payloads will be executed.
 
   After compiling with all these changes `checksec` tool shows the following:
 
-![Canary Found](./stack.png)
+![Canary Found](./stack.png){width=60%}
 
 
 ## Recommendation for future processes
-There are few things to improve on the overall project devopment process from specification, design and conceptual to the development and deployment. 
+There are few things to improve on the overall project devopment process from specification, design and conceptual to the development and deployment.
+
 - Initially, Developers should be aware of which functions are used/not-used for the operation of the program/system
 - Developers should follow the `secure coding practices` such as not using vulnerable functions, sanitizing user inputs and so on.
 - During compilation, security should be considered.
