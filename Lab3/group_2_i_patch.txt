@@ -1,0 +1,79 @@
+diff '--color=auto' --unified --recursive test-set/project_v0/sources/functions/functions.c "test-set (2)/project_v0/sources/functions/functions.c"
+--- test-set/project_v0/sources/functions/functions.c	2024-11-29 21:44:41.449691342 +0100
++++ "test-set (2)/project_v0/sources/functions/functions.c"	2024-10-11 16:16:18.000000000 +0200
+@@ -4,7 +4,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+-#include <sys/stat.h> 
++
+ #include "functions.h"
+ #include "hidden_functions/hidden_functions.h"
+ 
+@@ -27,18 +27,8 @@
+                 break;
+             case (int) 'o':
+                 /* Output file */
+-                *out = (char *) malloc(sizeof(char) * (strlen(optarg) + 1)); // +1 for null terminator
+-                if (*out == NULL) return EXIT_FAILURE; // Checking for malloc failure
+-
+-                // Input validation: disallow system files
+-                if (strstr(optarg, "/etc/") != NULL) {
+-                    fprintf(stderr, "Output file cannot be a system file.\n");
+-                    free(*in); // Free allocated memory
+-                    free(*out);
+-                    return EXIT_FAILURE;
+-                }
+-
+-                strcpy(*out, optarg);
++                *out = (char *) malloc(sizeof(char) * strlen(optarg));
++                (void) strcpy(*out, optarg);
+                 i++;
+                 break;
+             case (int) '?':
+@@ -62,29 +52,8 @@
+     if (!error) {
+         error = access(out, W_OK);
+         if (!error) {
+-            // Checking if the output file is a symblink
+-            struct stat statbuf;
+-            if (lstat(out, &statbuf) == 0 && S_ISLNK(statbuf.st_mode)){
+-                fprintf(stderr, "Output file cannot be a symblink.\n");
+-                return -1;
+-            }
+-               
+-            // Waiting for user confirmation
+             error = wait_confirmation(in, out);
+-            if (error == 0){
+-                fprintf(stderr, "Operation cancelled.\n");
+-                return -1;
+-            } else if (error<0){
+-                return error;
+-            }
+-
+-            // Proceeding with file copy only if confirmed
+-            error = copy_file(in, out);
+-            if (error != 0) {
+-                fprintf(stderr, "Failed to copy file.\n");
+-                return error;
+-            }
+-
++            copy_file(in, out);
+         } else {
+             fprintf(stderr, "File %s cannot be written.\n", out);
+         }
+diff '--color=auto' --unified --recursive test-set/project_v0/sources/functions/hidden_functions/hidden_functions.c "test-set (2)/project_v0/sources/functions/hidden_functions/hidden_functions.c"
+--- test-set/project_v0/sources/functions/hidden_functions/hidden_functions.c	2024-11-29 21:32:19.572720867 +0100
++++ "test-set (2)/project_v0/sources/functions/hidden_functions/hidden_functions.c"	2023-11-24 14:02:33.000000000 +0100
+@@ -41,9 +41,8 @@
+         perror("poll");
+         return -1;
+     } else if (test == 0) {
+-        fprintf(stderr, "Timeout. Operation is not complete\n");
+-        // Indicating that the confirmation is not received. 
+-        return 0;
++        fprintf(stderr, "Timeout.\n");
++        return 3;
+     }
+ 
+     const unsigned char uc   = (unsigned char) getchar();
