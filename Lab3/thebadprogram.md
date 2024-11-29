@@ -24,7 +24,7 @@ lang: en-GB
 
 
 # Introduction
-
+In this practical session, we will learn and apply our knowledge on race condition and how it's vulnerability may pose threas to system security, how one can exploit using such vulnerability, and their mitigations. This lab work will enable us to get hands-on on system level exploit and privilege escalation. Finally, we demonstrate on how we could achieve system level access with exploiting the vulnerability..
 
 # Analysis
 In this section, we first build our program to get its executable binary and observe it's behaviour by executing with different inputs. We will also explore if there are any threats or issues we can find potential to be exploited.
